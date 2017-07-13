@@ -6,9 +6,11 @@ class PaintingComponent extends React.Component {
   constructor(props) {
     super(props)
     this.state ={
+      id: null,
       penDown: false,
       context: null,
       canvas: null,
+      currentlyDrawing: []
     }
 
     this.loadImage = this.loadImage.bind(this);
@@ -16,10 +18,32 @@ class PaintingComponent extends React.Component {
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.handleMouseDown = this.handleMouseDown.bind(this);
     this.handleMouseUp = this.handleMouseUp.bind(this);
+    this.handleConnection = this.handleConnection.bind(this);
+    this.handleOnDrawing = this.handleOnDrawing.bind(this);
+    this.handleStopDrawing = this.handleStopDrawing.bind(this);
 
     this.socket = io();
     this.socket.on(this.props.socketMessage, this.loadImage);
     this.socket.on('clear', this.resetCanvas);
+    this.socket.on('success', this.handleConnection);
+    this.socket.on('drawing', this.handleOnDrawing);
+    this.socket.on('stopDrawing', this.handleStopDrawing);
+  }
+
+  handleOnDrawing(id){
+    const drawers = this.state.currentlyDrawing;
+    this.setState({currentlyDrawing: [id, ...drawers]});
+  }
+
+  handleStopDrawing(id){
+    const drawers = this.state.currentlyDrawing.filter((members) => {
+      return members != id;
+    });
+    this.setState({currentlyDrawing: drawers});
+  }
+
+  handleConnection(id){
+    this.setState({id: id});
   }
 
   loadImage(painting) {
@@ -69,10 +93,12 @@ handleMouseMove(){
 
 handleMouseDown(){
   this.setState({penDown: true});
+  this.socket.emit('drawing', this.state.id);
 }
 
 handleMouseUp(){
   this.setState({penDown: false});
+  this.socket.emit('stopDrawing', this.state.id);
 }
 
 setupCanvas(){

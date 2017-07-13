@@ -12,7 +12,8 @@ app.use(express.static('client/build'));
 var initPaint;
 
 io.on("connection", function(socket){
-  console.log("Connection!")
+  console.log("Connection!");
+  socket.emit('success', socket.id);
 
   socket.on('clear', () => {
     if (!initPaint) return;
@@ -27,6 +28,14 @@ io.on("connection", function(socket){
   socket.on("paint", (painting) => {
     initPaint = painting;
     io.sockets.emit('paint', painting);
+  });
+
+  socket.on('drawing', (id) => {
+    io.sockets.emit('drawing', id);
+  })
+
+  socket.on('stopDrawing', (id) => {
+    io.sockets.emit('stopDrawing', id);
   })
 })
 
