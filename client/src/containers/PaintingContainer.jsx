@@ -1,4 +1,5 @@
 import React from 'react'
+import PaintComponent from '../components/PaintingComponent'
 
 
 class PaintingContainer extends React.Component {
@@ -9,7 +10,8 @@ class PaintingContainer extends React.Component {
   render() {
     return(
       <div>
-        Hello World
+        Hello World!
+        <PaintComponent/>
 
       </div>
       )
