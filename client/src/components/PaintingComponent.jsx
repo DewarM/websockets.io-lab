@@ -11,11 +11,16 @@ class PaintingComponent extends React.Component {
       canvas: null,
     }
 
-    this.socket = io();
-    this.socket.on(this.props.socketMessage, this.loadImage.bind(this));
-    this.socket.on('clear', this.resetCanvas.bind(this));
-  }
+    this.loadImage = this.loadImage.bind(this);
+    this.resetCanvas = this.resetCanvas.bind(this);
+    this.handleMouseMove = this.handleMouseMove.bind(this);
+    this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleMouseUp = this.handleMouseUp.bind(this);
 
+    this.socket = io();
+    this.socket.on(this.props.socketMessage, this.loadImage);
+    this.socket.on('clear', this.resetCanvas);
+  }
 
   loadImage(painting) {
     const img = document.createElement("img");
@@ -25,7 +30,6 @@ class PaintingComponent extends React.Component {
     };
     img.src = painting;
   }
-
 
 componentDidMount(){
   const canvas = this.refs.canvas;
@@ -58,28 +62,30 @@ updateCanvas(ctx, canvas){
   })
 }
 
+handleMouseMove(){
+  if (!this.state.penDown) return;
+  this.draw(event.layerX, event.layerY)
+}
+
+handleMouseDown(){
+  this.setState({penDown: true});
+}
+
+handleMouseUp(){
+  this.setState({penDown: false});
+}
+
 setupCanvas(){
   const canvas = this.state.canvas;
   const ctx = this.state.context;
-  this.setState({originalCanvas: canvas.toDataURL()});
-  canvas.addEventListener('mousemove', function(event){
-    if (!this.state.penDown) return;
-    this.draw(event.layerX, event.layerY)
-
-  }.bind(this))
-  canvas.addEventListener('mousedown', function(){
-    this.setState({penDown: true})
-  }.bind(this))
-  canvas.addEventListener('mouseup', function(){
-    this.setState({penDown: false})
-  }.bind(this))
+  canvas.addEventListener('mousemove', this.handleMouseMove);
+  canvas.addEventListener('mousedown', this.handleMouseDown);
+  canvas.addEventListener('mouseup', this.handleMouseUp);
 }
 
 resetCanvas() {
-  console.log("reset");
   const canvas = this.state.canvas;
   const ctx = this.state.context;
-
   ctx.clearRect(0,0,canvas.width,canvas.height);
   this.socket.emit('clear');
 }
@@ -88,7 +94,7 @@ render() {
   return(
     <div>
     <canvas ref="canvas" id="canvas" width={500} height={500}/>
-    <button id="button" width={50} height={50} onClick={this.resetCanvas.bind(this)}>Reset</button>
+    <button id="button" width={50} height={50} onClick={this.resetCanvas}>Reset</button>
 
     </div>
     )

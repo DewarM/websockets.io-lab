@@ -21,7 +21,7 @@ io.on("connection", function(socket){
   })
 
   if (initPaint) {
-    io.sockets.emit('paintB', initPaint)
+    io.sockets.emit('paint', initPaint)
   }
 
   socket.on("paint", (painting) => {
