@@ -9,7 +9,6 @@ class PaintingComponent extends React.Component {
       penDown: false,
       context: null,
       canvas: null,
-      originalCanvas: null
     }
 
     this.socket = io();
@@ -22,7 +21,7 @@ class PaintingComponent extends React.Component {
     const img = document.createElement("img");
     img.onload = () => {
       const ctx = this.state.context;
-      ctx.drawImage(img,0,0); // Or at whatever offset you like
+      ctx.drawImage(img,0,0);
     };
     img.src = painting;
   }
@@ -52,7 +51,7 @@ draw(x,y){
 
 updateCanvas(ctx, canvas){
   this.setState({
-    ctx: ctx, 
+    ctx: ctx,
     canvas: canvas
   }, () => {
     this.socket.emit(this.props.socketMessage, this.state.canvas.toDataURL());
@@ -77,11 +76,12 @@ setupCanvas(){
 }
 
 resetCanvas() {
-  console.log("here");
+  console.log("reset");
   const canvas = this.state.canvas;
   const ctx = this.state.context;
 
   ctx.clearRect(0,0,canvas.width,canvas.height);
+  this.socket.emit('clear');
 }
 
 render() {

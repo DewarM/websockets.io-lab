@@ -9,28 +9,24 @@ app.get('/', function (req, res) {
 
 app.use(express.static('client/build'));
 
-var initPaintA;
-var initPaintB;
+var initPaint;
 
 io.on("connection", function(socket){
   console.log("Connection!")
-  if (initPaintA) {
-    io.sockets.emit('paintA', initPaintA)
-  }
-  if (initPaintB) {
-    io.sockets.emit('paintB', initPaintB)
-  }
-  socket.on("paintA", (painting) => {
-    initPaintA = painting;
-    io.sockets.emit('paintA', painting);
-  })
-  socket.on("paintB", (painting) => {
-    initPaintB = painting;
-    io.sockets.emit('paintB', painting);
-  })
-  socket.on('clear', (painting) => {
-    console.log("here")--
+
+  socket.on('clear', () => {
+    if (!initPaint) return;
+    initPaint = undefined;
     io.sockets.emit('clear');
+  })
+
+  if (initPaint) {
+    io.sockets.emit('paintB', initPaint)
+  }
+
+  socket.on("paint", (painting) => {
+    initPaint = painting;
+    io.sockets.emit('paint', painting);
   })
 })
 
