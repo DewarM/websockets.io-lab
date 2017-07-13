@@ -10,8 +10,8 @@ class PaintingContainer extends React.Component {
   render() {
     return(
       <div>
-        Hello World!
-        <PaintComponent/>
+        <PaintComponent socketMessage="paintA" />
+        <PaintComponent socketMessage="paintB" />
 
       </div>
       )
