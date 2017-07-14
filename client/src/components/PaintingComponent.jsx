@@ -117,11 +117,16 @@ resetCanvas() {
 }
 
 render() {
+  const currentlyDrawing = this.state.currentlyDrawing.map((id) => {
+    return <li key={id}>{id} is currently drawing</li>
+  });
   return(
     <div>
     <canvas ref="canvas" id="canvas" width={500} height={500}/>
     <button id="button" width={50} height={50} onClick={this.resetCanvas}>Reset</button>
-
+    <ul>
+      {currentlyDrawing}
+    </ul>
     </div>
     )
 }
